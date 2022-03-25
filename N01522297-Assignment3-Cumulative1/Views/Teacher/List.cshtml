@@ -1,0 +1,46 @@
+﻿@model List<N01522297_Assignment3_Cumulative1.Models.Teacher> 
+@{
+    ViewBag.Title = "List";
+}
+
+<h2>List of Teachers</h2>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>
+                Employee Number
+            </th>
+            <th>
+                First Name
+            </th>
+            <th>
+                Last Name
+            </th>
+            <th>
+                Employee Details
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (N01522297_Assignment3_Cumulative1.Models.Teacher teacher in Model)
+            {
+                <tr>
+                    <td>
+                        @teacher.EmployeeNumber
+                    </td>
+                    <td>
+                        @teacher.FirstName
+                    </td>
+                    <td>
+                        @teacher.LastName
+                    </td>
+                    <td>
+                        <a href="/Teacher/Show/@teacher.Id">View</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

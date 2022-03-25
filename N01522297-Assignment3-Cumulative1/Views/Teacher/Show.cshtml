@@ -1,0 +1,77 @@
+﻿@model N01522297_Assignment3_Cumulative1.Models.TeacherCourses
+@{
+    ViewBag.Title = "Show";
+}
+
+<h2>@Model.Teacher.FirstName @Model.Teacher.LastName Employee Details</h2>
+
+<div>
+    <label for="employee-id">Employee Number: </label>
+    <p id="employee-id">@Model.Teacher.EmployeeNumber</p>
+</div>
+<div>
+    <label for="employee-fname">First Name: </label>
+    <p id="employee-fname">@Model.Teacher.FirstName</p>
+</div>
+<div>
+    <label for="employee-lname">Last Name: </label>
+    <p id="employee-lname">@Model.Teacher.LastName</p>
+</div>
+<div>
+    <label for="employee-hire-date">Hire Date: </label>
+    <p id="employee-hire-date">@Model.Teacher.HireDate.ToShortDateString()</p>
+</div>
+<div>
+    <label for="employee-salary">Salary: </label>
+    <p id="employee-salary">$@Model.Teacher.Salary</p>
+</div>
+
+<h2>Courses</h2>
+@{
+    if (Model.Courses.Count() != 0)
+    {
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>
+                        Course Code
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Start Date
+                    </th>
+                    <th>
+                        Finish Date
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (N01522297_Assignment3_Cumulative1.Models.Course course in Model.Courses)
+                    {
+                        <tr>
+                            <td>
+                                @course.ClassCode
+                            </td>
+                            <td>
+                                @course.Name
+                            </td>
+                            <td>
+                                @course.StartDate.ToShortDateString()
+                            </td>
+                            <td>
+                                @course.FinishDate.ToShortDateString()
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h4>This teacher has no classes at this time!</h4>
+    }
+}
