@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 // Access School DB Context class
 using N01522297_Assignment3_Cumulative1.Models;
 // Access MySqlClient for database access
@@ -24,6 +25,7 @@ namespace N01522297_Assignment3_Cumulative1.Controllers
         /// <returns>List of Teacher objects containing all data from the database</returns>
         [HttpGet]
         [Route("api/TeacherData/ListTeachers")]
+        [EnableCors(origins: "*", methods: "*", headers: "*")]
         public List<Teacher> ListTeachers()
         {
             // Retrieve connection to database through its context
@@ -98,7 +100,7 @@ namespace N01522297_Assignment3_Cumulative1.Controllers
             // Create a new Teacher instance to store retrieved values from database
             Teacher foundTeacher = new Teacher();
             // While there is data from the database to be read, keep reading
-            while(reader.Read())
+            while (reader.Read())
             {
                 foundTeacher.FirstName = reader["teacherfname"].ToString();
                 foundTeacher.LastName = reader["teacherlname"].ToString();
@@ -148,12 +150,13 @@ namespace N01522297_Assignment3_Cumulative1.Controllers
             // Create a list of courses that are taught by the teacher with an id of teacherId
             TeacherCourses coursesTaught = new TeacherCourses();
             // While there are courses the teacher teaches, loop through them all, retrieving them from db, and storing them in the course list
-            while(reader.Read())
+            while (reader.Read())
             {
                 // Extract values from reader, storing them into a local Course object, then adding it to the coursesTaught list
 
                 // Set attributes of the teacher object in the TeacherCourses instance
                 // Note: The teacher is going to be the same within each loop
+                coursesTaught.Teacher.Id = (int)reader["teacherid"];
                 coursesTaught.Teacher.FirstName = reader["teacherfname"].ToString();
                 coursesTaught.Teacher.LastName = reader["teacherlname"].ToString();
                 coursesTaught.Teacher.EmployeeNumber = reader["employeenumber"].ToString();
@@ -182,6 +185,75 @@ namespace N01522297_Assignment3_Cumulative1.Controllers
 
             // Return list of courses taught
             return coursesTaught;
+        }
+        /// <summary>
+        /// Adds a new teacher to the database
+        /// </summary>
+        /// <param name="teacher">Teacher instance that contains data to add to the teachers database</param>
+        [HttpPost]
+        [Route("api/TeacherData/Add")]
+        [EnableCors(origins: "*", methods: "*", headers: "*")]
+        public void Add(Teacher teacher)
+        {
+            // Get access to a connection to the database from the context
+            MySqlConnection conn = ctxt.DatabaseConnection();
+
+            // Open up communication to the connection
+            conn.Open();
+
+            // Create an instance of a MySqlCommand through the connection method CreateCommand
+            MySqlCommand command = conn.CreateCommand();
+
+            // Define the query statement for adding a new teacher to the database
+            command.CommandText = "INSERT INTO teachers (teacherfname,teacherlname,employeenumber,hiredate,salary) VALUES(@f_name,@l_name,@employee_num,@hire_date,@salary)";
+
+            // Replace keys in SQL statement with respective values
+            command.Parameters.AddWithValue("@f_name", teacher.FirstName);
+            command.Parameters.AddWithValue("@l_name", teacher.LastName);
+            command.Parameters.AddWithValue("@employee_num", teacher.EmployeeNumber);
+            command.Parameters.AddWithValue("@hire_date", teacher.HireDate);
+            command.Parameters.AddWithValue("@salary", teacher.Salary);
+
+            // Prepare/sanitize parameter data
+            command.Prepare();
+
+            // Execute non query statement
+            command.ExecuteNonQuery();
+
+            // Close connection to database
+            conn.Close();
+        }
+        /// <summary>
+        /// Remove a teacher from the database
+        /// </summary>
+        /// <param name="teacherId">ID of teacher to be removed from the database</param>
+        [HttpGet]
+        [Route("api/TeacherData/Delete/{teacherId}")]
+        [EnableCors(origins: "*", methods: "*", headers: "*")]
+        public void Delete(int teacherId)
+        {
+            // Get access to a connection to the database from the context
+            MySqlConnection conn = ctxt.DatabaseConnection();
+
+            // Open up communication to the connection
+            conn.Open();
+
+            // Create an instance of a MySqlCommand through the connection method CreateCommand
+            MySqlCommand command = conn.CreateCommand();
+
+            // Define the query to execute for removing a teacher from the database
+            command.CommandText = "DELETE FROM teachers WHERE teacherid = @id";
+
+            // Replace id key with respective teacherId value
+            command.Parameters.AddWithValue("@id", teacherId);
+            // Prepare/sanitize data
+            command.Prepare();
+
+            // Execute the non query statement
+            command.ExecuteNonQuery();
+
+            // Close connection to the database
+            conn.Close();
         }
     }
 }
