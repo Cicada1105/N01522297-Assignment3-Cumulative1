@@ -1,0 +1,40 @@
+﻿@model N01522297_Assignment3_Cumulative1.Models.Teacher
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+@{ 
+    if (ViewBag.errorMsg != "")
+    {
+        <span style="color:red">@ViewBag.errorMsg</span>
+    }
+}
+<form action="/Teacher/Update/@Model.Id" method="POST">
+    <div>
+        <label for="first_name">First Name:</label>
+        <input id="first_name" type="text" value="@Model.FirstName" name="f_name" placeholder="Enter Value..." />
+    </div>
+    <div>
+        <label for="last_name">Last Name:</label>
+        <input id="last_name" type="text" value="@Model.LastName" name="l_name" placeholder="Enter Value..." />
+    </div>
+    <div>
+        <label for="employee_number">Employee Number:</label>
+        <!-- Pattern: Make sure the employee number starts with a "T" and is followed by 3 numbers -->
+        <input id="employee_number" type="text" value="@Model.EmployeeNumber" name="employee_num" pattern="T\d{3}" placeholder="Enter Value..." />
+    </div>
+    <div>
+        <label for="date_of_hiring">Hire Date:</label>
+        <!-- Convert the C# DateTime to an html input date readable format (Used microsoft docs for reference) -->
+        <input id="date_of_hiring" type="date" value='@Model.HireDate.ToUniversalTime().ToString("u").Split(' ')[0]' name="hire_date" />
+    </div>
+    <div>
+        <label for="salary">Salary:</label>
+        <input id="salary" type="number" value="@Model.Salary" name="salary" step="0.01" min="0" placeholder="0.00" />
+    </div>
+    <div>
+        <input type="submit" value="Submit" />
+    </div>
+</form>

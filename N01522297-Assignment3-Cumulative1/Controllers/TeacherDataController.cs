@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -102,6 +103,7 @@ namespace N01522297_Assignment3_Cumulative1.Controllers
             // While there is data from the database to be read, keep reading
             while (reader.Read())
             {
+                foundTeacher.Id = (int)reader["teacherid"];
                 foundTeacher.FirstName = reader["teacherfname"].ToString();
                 foundTeacher.LastName = reader["teacherlname"].ToString();
                 foundTeacher.EmployeeNumber = reader["employeenumber"].ToString();
@@ -254,6 +256,58 @@ namespace N01522297_Assignment3_Cumulative1.Controllers
 
             // Close connection to the database
             conn.Close();
+        }
+
+        /// <summary>
+        /// Searches for teacher with id property and updates additional properties in database accordingly
+        /// </summary>
+        /// <param name="teacher">Teacher object containing id for Primary Key access and additional info related to a teacher</param>
+        [HttpPost]
+        [Route("api/TeacherData/Update")]
+        [EnableCors(origins: "*", methods: "*", headers: "*")]
+        public bool Update(Teacher teacher)
+        {
+            // Check if there is any missing information
+            if (teacher.FirstName == "")
+                return false;
+            if (teacher.LastName == "")
+                return false;
+            // Employee number can be skipped for now as a  pattern is used to make sure it follows "T###" format
+            // Employee hiredate can be ignored as an error is already thrown if not provided
+            if (teacher.Salary == 0)
+                return false;
+
+            // Create a new connection to the databse through the data controller
+            MySqlConnection conn = ctxt.DatabaseConnection();
+
+            // Open up communication to this connection
+            conn.Open();
+
+            // Create a new instnace of a MySQL command object for setting queries
+            MySqlCommand command = conn.CreateCommand();
+            Debug.WriteLine(teacher.HireDate);
+            // Write the sql query for updating a teacher based on it's id Primary Key, including parameterization
+            command.CommandText = "UPDATE teachers SET teacherfname=@fName, teacherlname=@lName, employeenumber=@number, hiredate=@hiredate, salary=@salary WHERE teacherid=@id";
+
+            // Replace parameters with respective values
+            command.Parameters.AddWithValue("@fName", teacher.FirstName);
+            command.Parameters.AddWithValue("@lName", teacher.LastName);
+            command.Parameters.AddWithValue("@number", teacher.EmployeeNumber);
+            command.Parameters.AddWithValue("@hiredate", teacher.HireDate);
+            command.Parameters.AddWithValue("@salary", teacher.Salary);
+            command.Parameters.AddWithValue("@id", teacher.Id);
+
+            // Sanitize data
+            command.Prepare();
+
+            // Execute non query sql statement
+            command.ExecuteNonQuery();
+
+            // Once execution is done, close connection
+            conn.Close();
+
+            // Return true now that the update functionality has been a success
+            return true;
         }
     }
 }

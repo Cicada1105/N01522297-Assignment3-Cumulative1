@@ -74,5 +74,48 @@ namespace N01522297_Assignment3_Cumulative1.Controllers
             // Redirect to the List view in order for the user to see the updated teacher list
             return RedirectToAction("List");
         }
+        // GET: /Teacher/Edit/{id}
+        public ActionResult Edit(int id)
+        {
+            // Get access to the TeacherData controller api in order to retrieve author info with id
+            TeacherDataController controller = new TeacherDataController();
+            // Retrieve teacher info
+            Teacher currTeacher = controller.FindTeacher(id);
+
+            // Send teacher data to the view to be displayed
+            return View(currTeacher);
+        }
+        // POST: /Teacher/Update/{id}
+        [HttpPost]
+        public ActionResult Update(int id,string f_name, string l_name, string employee_num, DateTime hire_date, decimal salary)
+        {
+            // Create a new teacher to then send to the Update method of the Teacher Data Controller context
+            Teacher teacherToUpdate = new Teacher();
+
+            // Set teacher properties to those passed in through the Edit form submission
+            teacherToUpdate.Id = id;
+            teacherToUpdate.FirstName = f_name;
+            teacherToUpdate.LastName = l_name;
+            teacherToUpdate.EmployeeNumber = employee_num;
+            teacherToUpdate.HireDate = hire_date;
+            teacherToUpdate.Salary = salary;
+
+            // Create a new instance of the Teacher Data Controller to handle databse communicatoin
+            TeacherDataController controller = new TeacherDataController();
+            // Update teacher (returns success state)
+            bool isSuccess = controller.Update(teacherToUpdate);
+
+            // If the update was a success, redirect to viewing Teacher
+            if (isSuccess) { 
+                ViewBag["errorMsg"] = "";
+                return RedirectToAction("Show/" + teacherToUpdate.Id);
+            }
+            else
+            { // Return back to edit form passing in an error message to the ViewBag
+                ViewBag["errorMsg"] = "You are missing content in your form";
+                return RedirectToAction("Edit/" + teacherToUpdate.Id);
+            }
+
+        }
     }
 }

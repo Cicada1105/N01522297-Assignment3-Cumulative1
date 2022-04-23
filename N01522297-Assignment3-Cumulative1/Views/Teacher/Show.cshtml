@@ -4,7 +4,10 @@
 }
 
 <h2>@Model.Teacher.FirstName @Model.Teacher.LastName Employee Details</h2>
-<div><a href="/Teacher/Remove/@Model.Teacher.Id">Remove Teacher</a></div>
+<div>
+    <a href="/Teacher/Remove/@Model.Teacher.Id">Remove Teacher</a>
+    <a href="/Teacher/Edit/@Model.Teacher.Id">Update Teacher</a>
+</div>
 <div>
     <label for="employee-id">Employee Number: </label>
     <p id="employee-id">@Model.Teacher.EmployeeNumber</p>
